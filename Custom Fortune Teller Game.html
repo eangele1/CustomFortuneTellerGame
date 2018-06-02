@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<!-- Added Google Font "Bangers" -->
+	<link href='https://fonts.googleapis.com/css?family=Bangers' rel='stylesheet'>
+
+	<!-- Added jQuery to the game -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<!-- Page Title -->
+	<title>Custom Fortune Teller Game</title>
+
+	<!-- Makes website responsive to devices. -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<style type="text/css">
+
+	/*colors in the body page*/
+	body{
+		background-color: white;
+	}
+
+	/*CSS to keep square in the center of page*/
+	rect:before{
+		content: "";
+		display: block;
+		padding-top: 100%;
+	}
+
+	/*colors in the title of simulator*/
+	h1, h2{
+		color: black;
+		font-family: "Bangers";
+	}
+
+	/*color in the first message*/
+	p{
+		color: black;
+		font-family: "Trebuchet MS", Helvetica, sans-serif;
+	}
+
+</style>
+
+</head>
+<body>
+
+	<center>
+
+		<!-- Overall box that containes color boxes + hidden text for when the game starts -->
+		<svg width="400" height="405">
+			<g>
+				<rect onclick="colorToNumber(this.id)" id="sq1" x="0" y="0" width="200" height="200" style="fill:rgb(255,255,255);stroke:rgb(0,0,0)" />
+				<text id="txt1" x="85" y="110" font-family="Verdana" font-size="35" fill="black">0</text> 
+			</g>
+			
+			<g>
+				<rect onclick="colorToNumber(this.id)" id="sq2" x="0" y="200" width="200" height="200" style="fill:rgb(255,255,255);stroke:rgb(0,0,0)" />
+				<text id="txt2" x="85" y="310" font-family="Verdana" font-size="35" fill="black">0</text>
+			</g>
+			
+			<g>
+				<rect onclick="colorToNumber(this.id)" id="sq3" x="200" y="0" width="200" height="200" style="fill:rgb(255,255,255);stroke:rgb(0,0,0)" />
+				<text id="txt3" x="285" y="110" font-family="Verdana" font-size="35" fill="black">0</text>
+			</g>
+			
+			<g>
+				<rect onclick="colorToNumber(this.id)" id="sq4" x="200" y="200" width="200" height="200" style="fill:rgb(255,255,255);stroke:rgb(0,0,0)" />
+				<text id="txt4" x="285" y="310" font-family="Verdana" font-size="35" fill="black">0</text> 
+			</g>
+			
+		</svg>
+
+		<!-- Hidden div to be used when game is going -->
+		<div id="lines"></div>
+
+		<!-- Main div that contains intro screen -->
+		<div id="myDiv">
+
+			<!-- Game Title -->
+			<h1>Custom Fortune Teller Game!</h1>
+
+			<!-- First message -->
+			<p>This game will let you create your own fortune teller and play with your friends!</p>
+
+			<br>
+
+			<!-- First prompt -->
+			<h2>Pick your four colors:</h2>
+
+			<!-- Dropdown boxes that will contain the colors for colors array and includes null option -->
+			<select class="colorDropdown"></select>
+			<select class="colorDropdown"></select>
+			<select class="colorDropdown"></select>
+			<select class="colorDropdown"></select>
+
+			<!-- Second prompt -->
+			<h2><br>Write down your 8 fortunes:</h2>
+
+			<!-- Boxes that will contain each fortune and soon transfer them to fortunes array -->
+			<label for=”1”>1.</label>
+			<input type=”text” id="1"/></input>
+			<br>
+			<label for=”2”>2.</label>
+			<input type=”text” id="2"/></input>
+			<br>
+			<label for=”3”>3.</label>
+			<input type=”text” id="3"/></input>
+			<br>
+			<label for=”4”>4.</label>
+			<input type=”text” id="4"/></input>
+			<br>
+			<label for=”5”>5.</label>
+			<input type=”text” id="5"/></input>
+			<br>
+			<label for=”6”>6.</label>
+			<input type=”text” id="6"/></input>
+			<br>
+			<label for=”7”>7.</label>
+			<input type=”text” id="7"/></input>
+			<br>
+			<label for=”8”>8.</label>
+			<input type=”text” id="8"/></input>
+			<br>
+
+			<!-- Third prompt -->
+			<p id="prompt">When you are done, click Submit!</p>
+
+			<!-- Once user clicks button, the game starts with data collected -->
+			<button onclick="startGame()" id="submit">Submit</button>
+
+		</div>
+
+		<script type="text/javascript">
+
+		//DO NOT TOUCH BELOW FUCNTIONS - USED TO REMOVE ELEMENTS FROM DYNAMIC DIV
+		Element.prototype.remove = function() {
+			this.parentElement.removeChild(this);
+		}
+		NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+			for(var i = this.length - 1; i >= 0; i--) {
+				if(this[i] && this[i].parentElement) {
+					this[i].parentElement.removeChild(this[i]);
+				}
+			}
+		}
+		//DO NOT TOUCH ABOVE FUCNTIONS - USED TO REMOVE ELEMENTS FROM DYNAMIC DIV
+
+		//variable to have rectangles be clickable after submit button
+		var colorSwitch = false;
+		var numberSwitch1 = false;
+		var numberSwitch2 = false;
+		var restartSwitch = false;
+
+		//last prompt for user to restart the sequence.
+		function thankYou(){
+			restartSwitch = true;
+			$("#lines").append("<button id='submit'>Yes</button>");
+			$("#lines").append("<button id='restart'>No</button>");
+
+			//starts game again with same elements
+			document.getElementById("submit").onclick = function(){
+				sameGame();
+			}
+
+			//reloads page for everything to start over
+			document.getElementById("restart").onclick = function(){
+				location.reload();
+			}
+		}
+
+		//Function to dynamically create select list and adding options to it
+		function optionGenerator(selectId,paramObj){
+			//creates child <option> element
+			var optionInstance = document.createElement("option");
+			optionInstance.value = paramObj.optValue;
+			optionInstance.text = paramObj.optText;
+    		//adds the <option> tag with desired values
+    		selectId.options.add(optionInstance);
+    	}
+
+    	//sets each text to hidden so that they will be hidden until the game starts
+    	document.getElementById("txt1").style.visibility = "hidden";
+    	document.getElementById("txt2").style.visibility = "hidden";
+    	document.getElementById("txt3").style.visibility = "hidden";
+    	document.getElementById("txt4").style.visibility = "hidden";
+
+		//get the select element by its id
+		var colorSelectId = document.getElementsByClassName("colorDropdown");
+
+		//values of dropdown boxes
+		var colorValues = ["NULL", "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Brown", "Black", "White", "Pink", "Grey"];
+		//text of dropdown boxes
+		var colorText = ["------", "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Brown", "Black", "White", "Pink", "Grey"];
+
+		//dynamic arrays for colors and fortunes
+		var colors = [];
+		var fortunes = [];
+
+		//for loop to modify each box
+		for(var j = 0; j < 4; j++){
+			//for loop to create the options - in my case 12 options
+			for (var i = 0; i < 12 ; i++) {
+				//declaring an obj for the 'option' tag's parameters
+				var paramObj = {
+				//value for the 'option' tag
+				'optValue': colorValues[i],
+				//text for the 'option' tag
+				'optText': colorText[i]
+			};
+				//function which actually creates <option> tags and assigns the parameters to it/
+				optionGenerator(colorSelectId[j],paramObj); 
+			}
+		}
+
+		//jQuery to disable options in dropdown boxes once it is selected.
+		var $select = $("select");
+		$select.on("change", function() {
+			var selected = [];  
+			$.each($select, function(index, select) {           
+				if (select.value !== "") {
+					selected.push(select.value);
+				}
+			});         
+			$("option").prop("disabled", false);         
+			for (var index in selected){
+				$('option[value="'+selected[index]+'"]').prop("disabled", true);
+			}
+		});
+
+		//similar to startGame but deletes elements from "lines" div and reapplies elements and data
+		function sameGame(){
+
+			if (restartSwitch == true){
+
+				document.getElementById("titles").remove();
+				document.getElementById("fortuneOfTheDay").remove();
+				document.getElementById("startOver").remove();
+				document.getElementById("submit").remove();
+				document.getElementById("restart").remove();
+
+				$("#lines").append("<h1 id='titles'>Pick a color!</h1>");
+				$("#lines").append("<p id='fortuneOfTheDay'></p>");
+				$("#lines").append("<h2 id='startOver'></h2>");
+
+				restartSwitch = false;
+			}
+
+			var rgbColors = ["Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Brown", "Black", "White", "Pink", "Grey"];
+
+			for (var i = 1, j = 0; i < 5; i++) {
+				
+				var num = i;
+				var n = num.toString();
+
+				var str1 = "sq";
+
+				var res = str1.concat(n);
+
+				var e = document.getElementById(res);
+				for (var k = 0; k < rgbColors.length; k++) {
+					if(colors[j] == rgbColors[k]){
+						e.style.fill = rgbColors[k];
+						j++;
+						break;
+					}
+				}
+			}
+
+			colorSwitch = true;
+
+			return;
+		}
+
+		//main function of game.
+		function startGame(){
+
+			for (var i = 0; i < 4; i++) {
+
+				var e = colorSelectId[i];
+				var element = e.options[e.selectedIndex].value;
+
+				if (element == "NULL"){
+					document.getElementById("prompt").innerHTML = "Whoa there! Fix anything you left out and then press submit!";
+					return;
+				}
+				
+			}
+
+			for (var i = 1; i < 9; i++) {
+				var num = i;
+				var n = num.toString();
+
+				if (document.getElementById(n).value.length == 0){
+					document.getElementById("prompt").innerHTML = "Whoa there! Fix anything you left out and then press submit!";
+					return;
+				}
+			}
+
+			$("#lines").append("<h1 id='titles'>Pick a color!</h1>");
+			$("#lines").append("<p id='fortuneOfTheDay'></p>");
+			$("#lines").append("<h2 id='startOver'></h2>");
+
+			for (var i = 0; i < 4; i++) {
+				var e = colorSelectId[i];
+				colors.push(e.options[e.selectedIndex].value);
+			}
+
+			console.log(colors);
+
+			for (var i = 1; i < 9; i++) {
+				var num = i;
+				var n = num.toString();
+				fortunes.push(document.getElementById(n).value);
+			}
+
+			//removes initial messages inside of div
+			var elem = document.getElementById("myDiv");
+			elem.remove();
+
+			var rgbColors = ["Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Brown", "Black", "White", "Pink", "Grey"];
+
+			for (var i = 1, j = 0; i < 5; i++) {
+				
+				var num = i;
+				var n = num.toString();
+
+				var str1 = "sq";
+
+				var res = str1.concat(n);
+
+				var e = document.getElementById(res);
+				for (var k = 0; k < rgbColors.length; k++) {
+					if(colors[j] == rgbColors[k]){
+						e.style.fill = rgbColors[k];
+						j++;
+						break;
+					}
+				}
+			}
+
+			colorSwitch = true;
+
+			return;
+
+		}
+
+		//function of the squares when they are clicked on
+		function colorToNumber(this_id){
+
+			var colorName = "";
+
+			if(colorSwitch == true){
+
+				for (var i = 1; i < 5; i++) {
+
+					var num = i;
+					var n = num.toString();
+
+					var str1 = "sq";
+
+					var res = str1.concat(n);
+
+					var e = document.getElementById(res);
+					e.style.fill = "White";
+				}
+
+				document.getElementById("txt1").style.visibility = "visible";
+				document.getElementById("txt2").style.visibility = "visible";
+				document.getElementById("txt3").style.visibility = "visible";
+				document.getElementById("txt4").style.visibility = "visible";
+
+				console.log(colors);
+
+				console.log(this_id);
+
+				var condition = false;
+
+				for (var i = 1, j = 0; i < 5 && !condition; i++) {
+
+					var num = i;
+					var n = num.toString();
+
+					var str1 = "sq";
+
+					var res = str1.concat(n);
+
+					if(this_id == res){
+						colorName = colors[j];
+
+						console.log(colorName);
+
+						if(colorName.length % 2 != 0){
+
+							document.getElementById("txt1").innerHTML = "3";
+							document.getElementById("txt2").innerHTML = "4";
+							document.getElementById("txt3").innerHTML = "7";
+							document.getElementById("txt4").innerHTML = "8";
+
+							document.getElementById("titles").innerHTML = "Pick a number!";
+
+							condition = true;
+
+							colorSwitch = false;
+
+							numberSwitch1 = true;
+
+							return;
+
+						}
+						else if(colorName.length % 2 == 0){
+
+							document.getElementById("txt1").innerHTML = "1";
+							document.getElementById("txt2").innerHTML = "2";
+							document.getElementById("txt3").innerHTML = "5";
+							document.getElementById("txt4").innerHTML = "6";
+
+							document.getElementById("titles").innerHTML = "Pick a number!";
+
+							condition = true;
+
+							colorSwitch = false;
+
+							numberSwitch1 = true;
+
+							return;
+
+						}
+
+					}
+					j++;
+				}
+
+			}
+
+			if(numberSwitch1 == true){
+
+				var number = 0;
+
+				var condition = false;
+
+				for (var i = 1, j = 0; i < 5 && !condition; i++) {
+
+					var num = i;
+					var n = num.toString();
+
+					var str1 = "sq";
+					var str2 = "txt";
+
+					var res = str1.concat(n);
+
+					var res1 = str2.concat(n);
+
+					if(this_id == res){
+						number = Number(document.getElementById(res1).innerHTML);
+
+						console.log(number);
+
+						if(number % 2 != 0){
+
+							document.getElementById("txt1").innerHTML = "3";
+							document.getElementById("txt2").innerHTML = "4";
+							document.getElementById("txt3").innerHTML = "7";
+							document.getElementById("txt4").innerHTML = "8";
+
+							document.getElementById("titles").innerHTML = "Pick another number!";
+
+							condition = true;
+
+							numberSwitch1 = false;
+
+							numberSwitch2 = true;
+
+							return;
+
+						}
+						else if(number % 2 == 0){
+
+							document.getElementById("txt1").innerHTML = "1";
+							document.getElementById("txt2").innerHTML = "2";
+							document.getElementById("txt3").innerHTML = "5";
+							document.getElementById("txt4").innerHTML = "6";
+
+							document.getElementById("titles").innerHTML = "Pick another number!";
+
+							condition = true;
+
+							numberSwitch1 = false;
+
+							numberSwitch2 = true;
+
+							return;
+
+						}
+
+					}
+					j++;
+				}
+
+			}
+
+			if(numberSwitch2 == true){
+
+				var number = 0;
+
+				var condition = false;
+
+				for (var i = 1, j = 0; i < 5 && !condition; i++) {
+
+					var num = i;
+					var n = num.toString();
+
+					var str1 = "sq";
+					var str2 = "txt";
+
+					var res = str1.concat(n);
+					var res1 = str2.concat(n);
+
+					if(this_id == res){
+						number = Number(document.getElementById(res1).innerHTML);
+
+						console.log(number);
+
+						numberSwitch2 = false;
+
+						document.getElementById("txt1").style.visibility = "hidden";
+						document.getElementById("txt2").style.visibility = "hidden";
+						document.getElementById("txt3").style.visibility = "hidden";
+						document.getElementById("txt4").style.visibility = "hidden";
+
+						document.getElementById("titles").innerHTML = "Your fortune of the day is:";
+
+						document.getElementById("fortuneOfTheDay").innerHTML = fortunes[number - 1];
+
+						document.getElementById("startOver").innerHTML = "Start again with same game?";
+
+						thankYou();
+
+					}
+					j++;
+				}
+
+			}
+
+			else{
+				return;
+			}
+		}
+			//END OF SCRIPT
+		</script>
+
+	</center>
+
+</body>
+</html>
