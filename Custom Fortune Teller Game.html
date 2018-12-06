@@ -2,6 +2,9 @@
 <html>
 <head>
 
+	<!-- Makes game mobile friendly when downloaded to home screen -->
+	<meta name="apple-mobile-web-app-capable" content="yes">
+
 	<!-- Added Google Font "Bangers" -->
 	<link href='https://fonts.googleapis.com/css?family=Bangers' rel='stylesheet'>
 
@@ -14,11 +17,24 @@
 	<!-- Makes website responsive to devices. -->
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
+	<!-- Adds icon to game (viewable on the home screen) -->
+	<link rel="apple-touch-icon" href="single-page-icon.png">
+
+	<!-- Adds a splash screen to make game more mobile friendly -->
+	<link rel="apple-touch-startup-image" href="launch.png">
+
+	<!-- Adds a title to game to make it more mobile friendly -->
+	<meta name="apple-mobile-web-app-title" content="Fortune Game">
+
 	<style type="text/css">
 
 	/*colors in the body page*/
 	body{
 		background-color: white;
+		-webkit-user-select: none;
+		-webkit-tap-highlight-color: transparent;
+		-webkit-touch-callout: none;
+		
 	}
 
 	/*CSS to keep square in the center of page*/
