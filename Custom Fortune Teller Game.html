@@ -34,7 +34,7 @@
 		-webkit-user-select: none;
 		-webkit-tap-highlight-color: transparent;
 		-webkit-touch-callout: none;
-
+		visibility: visible;
 	}
 
 	/*CSS to keep square in the center of page*/
@@ -148,6 +148,34 @@
 		</div>
 
 		<script type="text/javascript">
+
+			//first body change
+			function changeBackground1() {
+				document.body.style.visibility = "hidden";
+				document.write("<center><p>For best results, please rotate back to portrait.</p></center>");
+			}
+
+			//second body change
+			function changeBackground2() {
+				document.body.style.visibility = "visible";
+			}
+
+			//changes body according to orientation
+			function applyOrientation() {
+				if (window.innerHeight < window.innerWidth) {
+					changeBackground1();
+				} 
+				else {
+					changeBackground2();
+				}
+			}
+
+			//checks to see if web browser is mobile. If so, then checks orientation to make sure browser is always in portrait mode
+			if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+				window.onresize = function (event) {
+					applyOrientation();
+				}
+			}
 
 		//DO NOT TOUCH BELOW FUCNTIONS - USED TO REMOVE ELEMENTS FROM DYNAMIC DIV
 		Element.prototype.remove = function() {
