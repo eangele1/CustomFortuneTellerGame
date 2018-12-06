@@ -151,7 +151,6 @@
 
 			//first body change
 			function changeBackground1() {
-				alert("For best results, change orientation to portrait.");
 				document.body.style.visibility = "hidden";
 			}
 
@@ -172,6 +171,7 @@
 
 			//checks to see if web browser is mobile. If so, then checks orientation to make sure browser is always in portrait mode
 			if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+				alert("For best results, keep orientation to portrait. Otherwise, the screen will stay blank.");
 				window.onresize = function (event) {
 					applyOrientation();
 				}
